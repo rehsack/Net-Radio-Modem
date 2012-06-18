@@ -16,7 +16,7 @@ Net::Radio::Modem::Adapter - base class for adapters to access radio network mod
 our $VERSION = '0.001';
 my %aliases = (
                 MNC    => 'MobileNetworkCode',
-                MCC    => 'MoileCountryCode',
+                MCC    => 'MobileCountryCode',
                 IMSI   => 'InternationalMobileSubscriberIdentity',
                 SNR    => 'SerialNumber',
                 LAC    => 'LocationAreaCode',
@@ -64,26 +64,26 @@ sub get_alias_for
 
 Placeholder for initalization routine / constructor for derived N:R:M:A
 
-Throws __FUNC__ . "unimplemented".
+Throws "unimplemented".
 
 =cut
 
 sub new
 {
-    die __FUNC__ . " unimplemented";    # with v5.12 we can use ...
+    die "unimplemented";    # with v5.12 we can use ...
 }
 
 =head2 get_modems
 
 Placeholder for method returning the list of known modems.
 
-Throws __FUNC__ . "unimplemented".
+Throws "unimplemented".
 
 =cut
 
 sub get_modems
 {
-    die __FUNC__ . " unimplemented";    # with v5.12 we can use ...
+    die "unimplemented";    # with v5.12 we can use ...
 }
 
 =head2 get_modem_property
@@ -91,13 +91,13 @@ sub get_modems
 Placeholder for method returning the value of named property for specified
 modem device.
 
-Throws __FUNC__ . "unimplemented".
+Throws "unimplemented".
 
 =cut
 
 sub get_modem_property
 {
-    die __FUNC__ . " unimplemented";    # with v5.12 we can use ...
+    die "unimplemented";    # with v5.12 we can use ...
 }
 
 1;

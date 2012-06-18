@@ -82,8 +82,7 @@ sub new
         foreach my $property ( keys %{ $params{$modem} } )
         {
             my $value = $params{$modem}->{$property};
-            defined $Net::Radio::Modem::Adapter::Alias{$property}
-              and $property = $Net::Radio::Modem::Adapter::Alias{$property};
+	    $property = __PACKAGE__->get_alias_for($property);
             $info{$modem}->{$property} = $value;
         }
     }
