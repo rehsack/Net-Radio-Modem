@@ -1,52 +1,112 @@
 package Net::Radio::Modem;
 
-use 5.006;
+use 5.010;
+
 use strict;
 use warnings;
 
 =head1 NAME
 
-Net::Radio::Modem - The great new Net::Radio::Modem!
-
-=head1 VERSION
-
-Version 0.01
+Net::Radio::Modem - Independently access radio network modems (such as 3GPP)
 
 =cut
 
-our $VERSION = '0.01';
-
+our $VERSION = '0.001';
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
+  use Net::Radio::Modem;
+  my $modem = Net::Radio::Modem->new('Static', '/test_0' => {
+      MNC => '262', MCC => '02', IMSI => '262020555017753',
+      LAC => ...}, '/test_1' => { ... } ... );
+  my @modems = $modem->get_modems(); # returns ('/test_0', 'test_1', ...)
+  my $local_modem = grep {
+         $modem->get_modem_property($_, 'MobileCountryCode') == 364
+     } @modems; # find the one for Bahamas
 
-Perhaps a little code snippet.
+  my $real_m = Net::Radio::Modem->new('oFono', {
+      dbus_main_runs => 0 # fetch values, don't rely on dbus-signals
+  });
+  my @rm = $real_m->get_modems();
+  my $o2sim = grep {
+	 $real_m->get_modem_property($_, 'MCC') == 262 # Germany
+     and $real_m->get_modem_property($_, 'MNC') ~~ qw(07 08 11) # O2
+     } @rf;
 
-    use Net::Radio::Modem;
+=head1 METHODS
 
-    my $foo = Net::Radio::Modem->new();
-    ...
+=head2 new($imp;@impl_args)
 
-=head1 EXPORT
+Instantiates new modem accessor from package C<Net::Radio::Modem::Adapter::$impl>.
+If no package C<Net::Radio::Modem::Adapter::$impl> is available,
+C<Net::Radio::Modem::Adapter::Null> is used.
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
-=head1 SUBROUTINES/METHODS
-
-=head2 function1
+C<@impl_args> are passed to the initialisation of the implementation class.
 
 =cut
 
-sub function1 {
+sub new
+{
+    my ( $class, $impl, @args ) = @_;
+
+    my $self = bless( {}, $class );
+
+    my $impl_class = _load_plugin($impl);
+    $impl_class //= _load_plugin("Net::Radio::Modem::Adapter::Null");
+
+    $self->{impl_class} = $impl_class;
+    $self->{impl}       = $impl_class->new(@args);
+
+    return $self;
 }
 
-=head2 function2
+sub _load_plugin
+{
+    my $plugin = shift;
+
+    $plugin->isa("Net::Radio::Modem::Adapter") and return $plugin;
+
+    ( my $module_file = "$plugin.pm" ) =~ s{::}{/}g;
+    defined $INC{$module_file} and return;
+
+    eval { require $module_file; };
+    if ($@)
+    {
+        $plugin =~ m/Net::Radio::Modem::Adapter/
+          or return _load_plugin("Net::Radio::Modem::Adapter::$plugin");
+    }
+    else
+    {
+        $plugin->isa("Net::Radio::Modem::Adapter") and return $plugin;
+    }
+
+    return;
+}
+
+=head2 get_modems()
+
+Provides a list of modems available.
 
 =cut
 
-sub function2 {
+sub get_modems
+{
+    return $_[0]->{impl}->get_modems();
+}
+
+=head2 get_modem_property($modem,$property)
+
+Provides the value of given property for specified modem.
+Property can be an L<Net::Radio::Modem::Adapter/Alias|alias name>.
+
+=cut
+
+sub get_modem_property
+{
+    my $self     = $_[0];
+    my $modem    = $_[1];
+    my $property = $self->{impl}->get_alias_for( $_[2] );
+    $self->{impl}->get_modem_property( $modem, $property );
 }
 
 =head1 AUTHOR
@@ -59,15 +119,11 @@ Please report any bugs or feature requests to C<bug-net-radio-modem at rt.cpan.o
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Radio-Modem>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
-
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Net::Radio::Modem
-
 
 You can also look for information at:
 
@@ -91,9 +147,28 @@ L<http://search.cpan.org/dist/Net-Radio-Modem/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
 
+=head1 ROADMAP
+
+Following things will be nice to have:
+
+=over 4
+
+=item *
+
+List of features useful in a perl module (excluding NIH features)
+
+=item *
+
+Class hierarchy with wrapper implementation of required functions
+using a configurable adapter class hierarchy.
+
+=item *
+
+Patches
+
+=back
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -108,4 +183,4 @@ See http://dev.perl.org/licenses/ for more information.
 
 =cut
 
-1; # End of Net::Radio::Modem
+1;    # End of Net::Radio::Modem
