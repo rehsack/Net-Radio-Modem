@@ -7,6 +7,10 @@ lib/Net/Radio/Modem/Adapter/Static.pm
 MANIFEST
 README
 t/00-load.t
+t/01-basic.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+Makefile.PL
+META.yml
+META.json
