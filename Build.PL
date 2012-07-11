@@ -1,4 +1,4 @@
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 use Module::Build;
@@ -9,10 +9,14 @@ my $builder = Module::Build->new(
     dist_author         => q{Jens Rehsack <rehsack@cpan.org>},
     dist_version_from   => 'lib/Net/Radio/Modem.pm',
     build_requires => {
-        'Test::More' => 0,
+	'Test::Deep' => 0,
+        'Test::More' => '0.90',
+    },
+    configure_requires => {
+	'Module::Build' => '0.38',
     },
     requires => {
-        'perl' => 5.006,
+        'perl' => 5.010,
     },
     add_to_cleanup      => [ 'Net-Radio-Modem-*' ],
     create_makefile_pl => 'traditional',
