@@ -13,7 +13,7 @@ Net::Radio::Modem::Adapter - base class for adapters to access radio network mod
 
 =cut
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 my %aliases = (
                 MNC    => 'MobileNetworkCode',
                 MCC    => 'MobileCountryCode',

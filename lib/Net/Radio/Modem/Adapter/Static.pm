@@ -44,7 +44,7 @@ L<http://en.wikipedia.org/wiki/Mobile_Network_Code>
 
 =cut
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use base qw(Net::Radio::Modem::Adapter);
 
 =head1 METHODS

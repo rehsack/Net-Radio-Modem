@@ -24,7 +24,7 @@ Sure, it would be easier to get an empty list. But TIAMTWTDO ;)
 
 =cut
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use base qw(Net::Radio::Modem::Adapter);
 
 =head1 METHODS
